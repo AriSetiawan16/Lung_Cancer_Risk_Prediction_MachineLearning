@@ -149,20 +149,23 @@ for col in categorical_columns:
     df[col] = le.fit_transform(df[col])
 ```
 
+
 ### 3. Feature Scaling (Standarisasi)
 
-Fitur numerik seperti `AGE` mengalami proses **standarisasi** menggunakan `StandardScaler`, karena model berbasis jarak seperti K-Nearest Neighbors (KNN) sensitif terhadap skala fitur.
+Setelah dataset dibagi menjadi data latih dan data uji, seluruh fitur numerik dilakukan **standarisasi** menggunakan `StandardScaler`. Ini bertujuan untuk menyamakan skala antar fitur, yang sangat penting terutama bagi model yang peka terhadap perbedaan skala seperti Random Forest, Logistic Regression, dan XGBoost.
 
 ```python
+from sklearn.preprocessing import StandardScaler
+
 scaler = StandardScaler()
-df['AGE'] = scaler.fit_transform(df[['AGE']])
+X_train[numerical_columns] = scaler.fit_transform(X_train[numerical_columns])
+X_test[numerical_columns] = scaler.transform(X_test[numerical_columns])
 ```
 
 > **Catatan:**
->
-> * **Standarisasi** = mengubah distribusi data agar memiliki **rata-rata 0** dan **standar deviasi 1**.
-> * **Normalisasi** (misalnya `MinMaxScaler`) digunakan bila ingin memetakan nilai ke rentang tertentu, seperti 0–1.
->   Pada tahap ini, yang dilakukan adalah **standarisasi**, bukan normalisasi.
+> - Standarisasi mengubah distribusi data agar memiliki **rata-rata 0** dan **standar deviasi 1**.
+> - Proses ini dilakukan **setelah** pembagian data (`train_test_split`) untuk menghindari **data leakage**.
+
 
 ### 4. Train-Test Split
 
@@ -183,7 +186,8 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_
 | -- | ---------------- | ------------------------------------------------------------------------ |
 | 1  | Data Cleaning    | Penghapusan duplikasi data                                               |
 | 2  | Encoding         | Konversi fitur kategorikal menggunakan LabelEncoder                      |
-| 3  | Standarisasi     | Skala numerik distandarkan untuk mendukung performa model berbasis jarak |
+| 3  | Train-Test Split | Pembagian data latih dan uji (80:20)                                      |
+| 4  | Standarisasi     | Standarisasi semua fitur numerik setelah pembagian data                   |
 | 4  | Train-Test Split | Pembagian data untuk evaluasi performa model                             |
 
 
